@@ -1,0 +1,63 @@
+---
+# tasks file for ansible-role-authorized-keys
+
+- name: Populate authorized_keys file for root user
+  when: remote_ssh_user == 'root'
+  block:
+    - name: Make .ssh directory for root user
+      ansible.builtin.file:
+        path: "/root/.ssh"
+        mode: '0700'
+        state: directory
+
+    - name: Check for existing authorized_keys file
+      ansible.builtin.stat:
+        path: /root/.ssh/authorized_keys
+      register: precondition
+      changed_when: false
+
+    - name: Create empty authorized_keys file for root user account
+      ansible.builtin.file:
+        path: "/root/.ssh/authorized_keys"
+        mode: '0644'
+        state: touch
+      when: not precondition.stat.exists
+
+    - name: Copy public SSH key into root users authorized_keys file
+      ansible.builtin.lineinfile:
+        path: "/root/.ssh/authorized_keys"
+        line: "{{ item }}"
+      with_items: "{{ vault_pubkeys }}"
+      # Turn off logging for task to prevent keys being printed in output/logs
+      no_log: true
+
+
+- name: Populate authorized_keys file for non-root user {{ remote_ssh_user }}
+  when: remote_ssh_user != 'root'
+  block:
+    - name: Make .ssh directory for user {{ remote_ssh_user }}
+      ansible.builtin.file:
+        path: "/home/{{ remote_ssh_user }}/.ssh"
+        mode: '0700'
+        state: directory
+
+    - name: Check for existing authorized_keys file
+      ansible.builtin.stat:
+        path: /home/{{ remote_ssh_user }}/.ssh/authorized_keys
+      register: precondition
+      changed_when: false
+
+    - name: Create empty authorized_keys file for root user account
+      ansible.builtin.file:
+        path: "/home/{{ remote_ssh_user }}/.ssh/authorized_keys"
+        mode: '0644'
+        state: touch
+      when: not precondition.stat.exists
+
+    - name: Copy public SSH key into root users authorized_keys file
+      ansible.builtin.lineinfile:
+        path: "/home/{{ remote_ssh_user }}/.ssh/authorized_keys"
+        line: "{{ item }}"
+      with_items: "{{ vault_pubkeys }}"
+      # Turn off logging for task to prevent keys being printed in output/logs
+      no_log: true
