@@ -1,4 +1,4 @@
-Role Name
+Ansible Role: Authorized Keys
 =========
 
 Sync SSH keys from remote hosts to the Ansible controller. This is useful when redeploying
