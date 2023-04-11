@@ -31,10 +31,9 @@ Example Playbook
       connection: local
       gather_facts: false
       become: false
-      tags: play_ssh_sync
 
       roles:
-        - ansible-role-ssh-update-known-hosts
+        - jedimt.authorized_keys
 
 License
 -------

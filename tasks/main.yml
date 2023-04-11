@@ -1,5 +1,5 @@
 ---
-# tasks file for ansible-role-authorized-keys
+# tasks file for ansible-role-authorized_keys
 
 - name: Populate authorized_keys file for root user
   when: remote_ssh_user == 'root'
