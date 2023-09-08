@@ -39,6 +39,7 @@
       ansible.builtin.file:
         path: "/home/{{ remote_ssh_user }}/.ssh"
         mode: '0700'
+        owner: "{{ remote_ssh_user }}"
         state: directory
 
     - name: Check for existing authorized_keys file
@@ -47,14 +48,15 @@
       register: precondition
       changed_when: false
 
-    - name: Create empty authorized_keys file for root user account
+    - name: Create empty authorized_keys file for {{ remote_ssh_user }} user account
       ansible.builtin.file:
         path: "/home/{{ remote_ssh_user }}/.ssh/authorized_keys"
         mode: '0644'
         state: touch
+        owner: "{{ remote_ssh_user }}"
       when: not precondition.stat.exists
 
-    - name: Copy public SSH key into root users authorized_keys file
+    - name: Copy public SSH key into {{ remote_ssh_user }} authorized_keys file
       ansible.builtin.lineinfile:
         path: "/home/{{ remote_ssh_user }}/.ssh/authorized_keys"
         line: "{{ item }}"
