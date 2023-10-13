@@ -2,7 +2,7 @@
 # tasks file for ansible-role-authorized_keys
 
 - name: Populate authorized_keys file for root user
-  when: remote_ssh_user == 'root'
+  when: ansible_user == 'root'
   block:
     - name: Make .ssh directory for root user
       ansible.builtin.file:
@@ -32,33 +32,33 @@
       no_log: true
 
 
-- name: Populate authorized_keys file for non-root user {{ remote_ssh_user }}
-  when: remote_ssh_user != 'root'
+- name: Populate authorized_keys file for non-root user {{ ansible_user }}
+  when: ansible_user != 'root'
   block:
-    - name: Make .ssh directory for user {{ remote_ssh_user }}
+    - name: Make .ssh directory for user {{ ansible_user }}
       ansible.builtin.file:
-        path: "/home/{{ remote_ssh_user }}/.ssh"
+        path: "/home/{{ ansible_user }}/.ssh"
         mode: '0700'
-        owner: "{{ remote_ssh_user }}"
+        owner: "{{ ansible_user }}"
         state: directory
 
     - name: Check for existing authorized_keys file
       ansible.builtin.stat:
-        path: /home/{{ remote_ssh_user }}/.ssh/authorized_keys
+        path: /home/{{ ansible_user }}/.ssh/authorized_keys
       register: precondition
       changed_when: false
 
-    - name: Create empty authorized_keys file for {{ remote_ssh_user }} user account
+    - name: Create empty authorized_keys file for {{ ansible_user }} user account
       ansible.builtin.file:
-        path: "/home/{{ remote_ssh_user }}/.ssh/authorized_keys"
+        path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
         mode: '0644'
         state: touch
-        owner: "{{ remote_ssh_user }}"
+        owner: "{{ ansible_user }}"
       when: not precondition.stat.exists
 
-    - name: Copy public SSH key into {{ remote_ssh_user }} authorized_keys file
+    - name: Copy public SSH key into {{ ansible_user }} authorized_keys file
       ansible.builtin.lineinfile:
-        path: "/home/{{ remote_ssh_user }}/.ssh/authorized_keys"
+        path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
         line: "{{ item }}"
       with_items: "{{ vault_pubkeys }}"
       # Turn off logging for task to prevent keys being printed in output/logs

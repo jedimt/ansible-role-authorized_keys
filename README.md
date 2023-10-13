@@ -12,8 +12,8 @@ None
 Role Variables
 --------------
 
-    # The remote user account to user
-    remote_ssh_user: "root"
+    # The remote user account to use for SSH connections. By default this role expects this value to be defined in ansible.cfg
+    ansible_user: "apatt"
 
     # Remote user SSH password to use for initial connection
     ansible_password: "{{ vault_ansible_password }}"
