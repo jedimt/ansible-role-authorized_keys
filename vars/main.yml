@@ -2,7 +2,7 @@
 # vars file for ansible-role-authorized_keys
 
 # The remote user account to user
-remote_ssh_user: "root"
+# remote_ssh_user: "root"
 
 # Remote user SSH password to use for initial connection
 ansible_password: "{{ vault_ansible_password }}"
